@@ -49,8 +49,7 @@ module ufifo #(
 		// {{{
 		parameter	BW=8,	// Byte/data width
 		parameter [3:0]	LGFLEN=4,
-		parameter [0:0]	RXFIFO=1'b1,
-		localparam	FLEN=(1<<LGFLEN)
+		parameter [0:0]	RXFIFO=1'b1
 		// }}}
 	) (
 		// {{{
@@ -65,6 +64,7 @@ module ufifo #(
 		// }}}
 	);
 
+		localparam	FLEN=(1<<LGFLEN);
 	// Signal declarations
 	// {{{
 	reg	[(BW-1):0]	fifo[0:(FLEN-1)];

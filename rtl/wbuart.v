@@ -47,12 +47,7 @@ module	wbuart #(
 		// 4MB 8N1, when using 100MHz clock
 		parameter [30:0] INITIAL_SETUP = 31'd25,
 		parameter [3:0]	LGFLEN = 4,
-		parameter [0:0]	HARDWARE_FLOW_CONTROL_PRESENT = 1'b1,
-		// Perform a simple/quick bounds check on the log FIFO length,
-		// to make sure its within the bounds we can support with our
-		// current interface.
-		localparam [3:0]	LCLLGFLEN = (LGFLEN > 4'ha)? 4'ha
-					: ((LGFLEN < 4'h2) ? 4'h2 : LGFLEN)
+		parameter [0:0]	HARDWARE_FLOW_CONTROL_PRESENT = 1'b1
 		// }}}
 	) (
 		// {{{
@@ -75,6 +70,12 @@ module	wbuart #(
 					o_uart_rxfifo_int, o_uart_txfifo_int
 		// }}}
 	);
+
+	// Perform a simple/quick bounds check on the log FIFO length,
+	// to make sure its within the bounds we can support with our
+	// current interface.
+	localparam [3:0]	LCLLGFLEN = (LGFLEN > 4'ha)? 4'ha
+				: ((LGFLEN < 4'h2) ? 4'h2 : LGFLEN);
 
 	localparam [1:0]	UART_SETUP = 2'b00,
 				UART_FIFO  = 2'b01,
@@ -146,7 +147,7 @@ module	wbuart #(
 
 	// The receiver itself
 	// {{{
-	// Here's our UART receiver.  Basically, it accepts our setup wires, 
+	// Here's our UART receiver.  Basically, it accepts our setup wires,
 	// the UART input, a clock, and a reset line, and produces outputs:
 	// a stb (true when new data is ready), and an 8-bit data out value
 	// valid when stb is high.
@@ -223,7 +224,7 @@ module	wbuart #(
 	// rxf_wb_read
 	// {{{
 	// If the bus requests that we read from the receive FIFO, we need to
-	// tell this to the receive FIFO.  Note that because we are using a 
+	// tell this to the receive FIFO.  Note that because we are using a
 	// clock here, the output from the receive FIFO will necessarily be
 	// delayed by an extra clock.
 	initial	rxf_wb_read = 1'b0;
@@ -312,8 +313,8 @@ module	wbuart #(
 	// Unlike the receiver which goes from RXUART -> UFIFO -> WB, the
 	// transmitter basically goes WB -> UFIFO -> TXUART.  Hence, to build
 	// support for the transmitter, we start with the command to write data
-	// into the FIFO.  In this case, we use the act of writing to the 
-	// UART_TXREG address as our indication that we wish to write to the 
+	// into the FIFO.  In this case, we use the act of writing to the
+	// UART_TXREG address as our indication that we wish to write to the
 	// FIFO.  Here, we create a write command line, and latch the data for
 	// the extra clock that it'll take so that the command and data can be
 	// both true on the same clock.
@@ -350,7 +351,7 @@ module	wbuart #(
 	//	position within it.
 	assign	o_uart_tx_int = txf_status[0];
 	//	The second will be true any time the FIFO is less than half
-	//	full, allowing us a change to always keep it (near) fully 
+	//	full, allowing us a change to always keep it (near) fully
 	//	charged.
 	assign	o_uart_txfifo_int = txf_status[1];
 	// }}}
@@ -435,13 +436,13 @@ module	wbuart #(
 	// This port is different from reading from the receive port, since
 	// there are no side effects.  (Reading from the receive port advances
 	// the receive FIFO, here only writing to the transmit port advances the
-	// transmit FIFO--hence the read values are free for ... whatever.)  
+	// transmit FIFO--hence the read values are free for ... whatever.)
 	// We choose here to provide information about the transmit FIFO
 	// (txf_err, txf_half_full, txf_full_n), information about the current
 	// voltage on the line (o_uart_tx)--and even the voltage on the receive
 	// line (ck_uart), as well as our current setting of the break and
 	// whether or not we are actively transmitting.
-	assign	wb_tx_data = { 16'h00, 
+	assign	wb_tx_data = { 16'h00,
 			i_cts_n, txf_status[1:0], txf_err,
 			ck_uart, o_uart_tx, tx_break, (tx_busy|txf_status[0]),
 			(tx_busy|txf_status[0])?txf_wb_data:8'b00};
@@ -459,7 +460,7 @@ module	wbuart #(
 	// wb_fifo_data
 	// {{{
 	// Each of the FIFO's returns a 16 bit status value.  This value tells
-	// us both how big the FIFO is, as well as how much of the FIFO is in 
+	// us both how big the FIFO is, as well as how much of the FIFO is in
 	// use.  Let's merge those two status words together into a word we
 	// can use when reading about the FIFO.
 	assign	wb_fifo_data = { txf_status, rxf_status };
@@ -468,7 +469,7 @@ module	wbuart #(
 	// r_wb_addr
 	// {{{
 	// You may recall from above that reads take two clocks.  Hence, we
-	// need to delay the address decoding for a clock until the data is 
+	// need to delay the address decoding for a clock until the data is
 	// ready.  We do that here.
 	always @(posedge i_clk)
 		r_wb_addr <= i_wb_addr;

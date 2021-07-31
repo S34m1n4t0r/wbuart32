@@ -11,7 +11,7 @@
 //	pass it the 32 bit setup register (defined below) and the UART
 //	input.  When data becomes available, the o_wr line will be asserted
 //	for one clock cycle.  On parity or frame errors, the o_parity_err
-//	or o_frame_err lines will be asserted.  Likewise, on a break 
+//	or o_frame_err lines will be asserted.  Likewise, on a break
 //	condition, o_break will be asserted.  These lines are self clearing.
 //
 //	There is a synchronous reset line, logic high.
@@ -51,13 +51,13 @@
 //		to run this serial port at 115200 baud from a 200 MHz clock,
 //		you would set the value to 24'd1736
 //
-//	Thus, to set the UART for the common setting of an 8-bit word, 
+//	Thus, to set the UART for the common setting of an 8-bit word,
 //	one stop bit, no parity, and 115200 baud over a 200 MHz clock, you
 //	would want to set the setup value to:
 //
 //	32'h0006c8		// For 115,200 baud, 8 bit, no parity
 //	32'h005161		// For 9600 baud, 8 bit, no parity
-//	
+//
 //
 //
 // Creator:	Dan Gisselquist, Ph.D.
@@ -94,7 +94,7 @@
 module rxuart #(
 		// {{{
 		// 8 data bits, no parity, (at least 1) stop bit
-		parameter [30:0] INITIAL_SETUP = 31'd868,
+		parameter [30:0] INITIAL_SETUP = 31'd868
 		// States: (@ baud counter == 0)
 		//	0	First bit arrives
 		//	..7	Bits arrive
@@ -104,22 +104,6 @@ module rxuart #(
 		//	d	Waiting for the channel to go high
 		//	e	Waiting for the reset to complete
 		//	f	Idle state
-		localparam [3:0]	RXU_BIT_ZERO    = 4'h0,
-					RXU_BIT_ONE     = 4'h1,
-					RXU_BIT_TWO     = 4'h2,
-					RXU_BIT_THREE   =  4'h3,
-					// RXU_BIT_FOUR = 4'h4, // UNUSED
-					// RXU_BIT_FIVE = 4'h5, // UNUSED
-					// RXU_BIT_SIX  = 4'h6, // UNUSED
-					RXU_BIT_SEVEN   = 4'h7,
-					RXU_PARITY      = 4'h8,
-					RXU_STOP        = 4'h9,
-					RXU_SECOND_STOP = 4'ha,
-					// Unused 4'hb
-					// Unused 4'hc
-					RXU_BREAK       = 4'hd,
-					RXU_RESET_IDLE  = 4'he,
-					RXU_IDLE        = 4'hf
 		// }}}
 	) (
 		// {{{
@@ -166,10 +150,27 @@ module rxuart #(
 
 	// }}}
 
+	localparam [3:0]	RXU_BIT_ZERO    = 4'h0,
+				RXU_BIT_ONE     = 4'h1,
+				RXU_BIT_TWO     = 4'h2,
+				RXU_BIT_THREE   =  4'h3,
+				// RXU_BIT_FOUR = 4'h4, // UNUSED
+				// RXU_BIT_FIVE = 4'h5, // UNUSED
+				// RXU_BIT_SIX  = 4'h6, // UNUSED
+				RXU_BIT_SEVEN   = 4'h7,
+				RXU_PARITY      = 4'h8,
+				RXU_STOP        = 4'h9,
+				RXU_SECOND_STOP = 4'ha,
+				// Unused 4'hb
+				// Unused 4'hc
+				RXU_BREAK       = 4'hd,
+				RXU_RESET_IDLE  = 4'he,
+				RXU_IDLE        = 4'hf;
+
 	// ck_uart
 	// {{{
 	// Since this is an asynchronous receiver, we need to register our
-	// input a couple of clocks over to avoid any problems with 
+	// input a couple of clocks over to avoid any problems with
 	// metastability.  We do that here, and then ignore all but the
 	// ck_uart wire.
 	initial	q_uart  = 1'b0;
@@ -265,7 +266,7 @@ module rxuart #(
 	// Yeah, this may be more complicated than it needs to be.  The basic
 	// progression is:
 	//	RESET -> RESET_IDLE -> (when line is idle) -> IDLE
-	//	IDLE -> bit 0 -> bit 1 -> bit_{ndatabits} -> 
+	//	IDLE -> bit 0 -> bit 1 -> bit_{ndatabits} ->
 	//		(optional) PARITY -> STOP -> (optional) SECOND_STOP
 	//		-> IDLE
 	//	ANY -> (on break) BREAK -> IDLE
@@ -439,7 +440,7 @@ module rxuart #(
 	// data register, o_data.
 	//
 	// We would also set o_wr to be true when this is the case, but ... we
-	// won't know if there is a frame error on the second stop bit for 
+	// won't know if there is a frame error on the second stop bit for
 	// another baud interval yet.  So, instead, we set up the logic so that
 	// we know on the next zero baud counter that we can write out.  That's
 	// the purpose of pre_wr.
@@ -510,5 +511,3 @@ module rxuart #(
 		zero_baud_counter <= (baud_counter == 28'h01);
 	// }}}
 endmodule
-
-

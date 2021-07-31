@@ -56,13 +56,13 @@
 //		to run this serial port at 115200 baud from a 200 MHz clock,
 //		you would set the value to 24'd1736
 //
-//	Thus, to set the UART for the common setting of an 8-bit word, 
+//	Thus, to set the UART for the common setting of an 8-bit word,
 //	one stop bit, no parity, and 115200 baud over a 200 MHz clock, you
 //	would want to set the setup value to:
 //
 //	32'h0006c8		// For 115,200 baud, 8 bit, no parity
 //	32'h005161		// For 9600 baud, 8 bit, no parity
-//	
+//
 //
 // Creator:	Dan Gisselquist, Ph.D.
 //		Gisselquist Technology, LLC
@@ -98,22 +98,7 @@
 // }}}
 module txuart #(
 		// {{{
-		parameter	[30:0]	INITIAL_SETUP = 31'd868,
-		//
-		localparam 	[3:0]	TXU_BIT_ZERO  = 4'h0,
-		localparam 	[3:0]	TXU_BIT_ONE   = 4'h1,
-		localparam 	[3:0]	TXU_BIT_TWO   = 4'h2,
-		localparam 	[3:0]	TXU_BIT_THREE = 4'h3,
-		// localparam 	[3:0]	TXU_BIT_FOUR  = 4'h4,
-		// localparam 	[3:0]	TXU_BIT_FIVE  = 4'h5,
-		// localparam 	[3:0]	TXU_BIT_SIX   = 4'h6,
-		localparam 	[3:0]	TXU_BIT_SEVEN = 4'h7,
-		localparam 	[3:0]	TXU_PARITY    = 4'h8,
-		localparam 	[3:0]	TXU_STOP      = 4'h9,
-		localparam 	[3:0]	TXU_SECOND_STOP = 4'ha,
-		//
-		localparam 	[3:0]	TXU_BREAK     = 4'he,
-		localparam 	[3:0]	TXU_IDLE      = 4'hf
+		parameter	[30:0]	INITIAL_SETUP = 31'd868
 		// }}}
 	) (
 		// {{{
@@ -160,6 +145,22 @@ module txuart #(
 	reg		calc_parity, r_busy, zero_baud_counter, last_state;
 	reg		q_cts_n, qq_cts_n, ck_cts;
 	// }}}
+
+	//
+	localparam 	[3:0]	TXU_BIT_ZERO  = 4'h0;
+	localparam 	[3:0]	TXU_BIT_ONE   = 4'h1;
+	localparam 	[3:0]	TXU_BIT_TWO   = 4'h2;
+	localparam 	[3:0]	TXU_BIT_THREE = 4'h3;
+	// localparam 	[3:0]	TXU_BIT_FOUR  = 4'h4,
+	// localparam 	[3:0]	TXU_BIT_FIVE  = 4'h5,
+	// localparam 	[3:0]	TXU_BIT_SIX   = 4'h6,
+	localparam 	[3:0]	TXU_BIT_SEVEN = 4'h7;
+	localparam 	[3:0]	TXU_PARITY    = 4'h8;
+	localparam 	[3:0]	TXU_STOP      = 4'h9;
+	localparam 	[3:0]	TXU_SECOND_STOP = 4'ha;
+	//
+	localparam 	[3:0]	TXU_BREAK     = 4'he;
+	localparam 	[3:0]	TXU_IDLE      = 4'hf;
 
 	// CTS: ck_cts
 	// {{{
@@ -244,7 +245,7 @@ module txuart #(
 			// for the baud clock to finish counting
 			// out this last bit.
 		end
-	end 
+	end
 	// }}}
 
 	// o_busy
@@ -950,7 +951,7 @@ module txuart #(
 		assert(use_parity);
 		assert(o_uart_tx == fsv_parity);
 	end
-		
+
 	always @(*)
 	if (f_stop_seq[1])
 	begin
@@ -967,7 +968,7 @@ module txuart #(
 		assert(o_uart_tx);
 		assert(baud_counter < fsv_setup[23:0]-1'b1);
 	end
-		
+
 
 	always @(*)
 	if (fsv_setup[25])
@@ -1210,4 +1211,3 @@ module txuart #(
 `endif	// FORMAL
 // }}}
 endmodule
-
