@@ -123,7 +123,7 @@ module	wbuart #(
 	// Under wishbone rules, a write takes place any time i_wb_stb
 	// is high.  If that's the case, and if the write was to the
 	// setup address, then set us up for the new parameters.
-	if ((i_wb_stb)&&(i_wb_addr == UART_SETUP)&&(i_wb_we))
+	if ((i_wb_stb)&&(i_wb_addr == UART_SETUP)&&(i_wb_we)&&~(r_wb_ack))
 	begin
 		if (i_wb_sel[0])
 			uart_setup[7:0] <= i_wb_data[7:0];
@@ -322,7 +322,7 @@ module	wbuart #(
 	always @(posedge i_clk)
 	begin
 		txf_wb_write <= (i_wb_stb)&&(i_wb_addr == UART_TXREG)
-					&&(i_wb_we)&&(i_wb_sel[0]);
+					&&(i_wb_we)&&(i_wb_sel[0])&&(~r_wb_ack);
 		txf_wb_data  <= i_wb_data[7:0];
 	end
 	// }}}
